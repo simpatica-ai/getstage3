@@ -24,33 +24,50 @@ functions.http('getstage3', async (req, res) => {
       return res.status(400).send({ error: 'Invalid request body' });
     }
 
-    const { virtueName, virtueDef, characterDefectAnalysis, stage1MemoContent } = req.body;
+    const { virtueName, virtueDef, characterDefectAnalysis, stage1MemoContent, stage2MemoContent, stage3MemoContent, stage1Complete, stage2Complete } = req.body;
 
     // Validate required fields
     if (!virtueName || !virtueDef || !characterDefectAnalysis) {
       return res.status(400).send({ error: 'Missing required fields: virtueName, virtueDef, and characterDefectAnalysis are required.' });
     }
 
-    // --- NEW STAGE 1 PROMPT ---
-    const prompt = `
-      You are an empathetic and wise recovery coach. Your task is to generate a motivating, introspective, and contextually aware writing prompt for a user working on Stage 1 of their virtue development, which is "Dismantling". Dismantling is not a friendly process, and inviting brutal honesty is key. Empathy is offered as we are more than our mistakes.
+    // Check if Stage 1 and Stage 2 are complete
+    if (!stage1Complete || !stage1MemoContent || stage1MemoContent.trim().length < 50) {
+      return res.status(200).send({
+        prompt: "Stage 3 (Maintaining) requires completion of Stage 1 (Dismantling) first. Please complete Stage 1 and mark it as complete before proceeding to Stage 3.",
+        requiresPreviousStages: true
+      });
+    }
 
-      **Objective of Dismantling:** Dismantling is the introspective practice of recognizing one's inner flaws (character defects), acknowledging the harm they cause, and making a resolute commitment to actively cease acting upon them.
+    if (!stage2Complete || !stage2MemoContent || stage2MemoContent.trim().length < 50) {
+      return res.status(200).send({
+        prompt: "Stage 3 (Maintaining) requires completion of both Stage 1 and Stage 2 (Building). Please complete Stage 2 and mark it as complete before proceeding to Stage 3.",
+        requiresPreviousStages: true
+      });
+    }
+
+    // --- STAGE 3 MAINTAINING PROMPT ---
+    const prompt = `
+      You are an empathetic and wise recovery coach. Your task is to generate a focused, reflective writing prompt for a user working on Stage 3 of their virtue development: "Maintaining".
+
+      **Maintaining Virtue Definition:** The practice of maintaining a virtue is an ongoing journey of continuous awareness and application, shifting from building new habits to sustaining them over time. This stage of a virtuous life requires you to consistently embody the virtue, notice subtle ways old character defects might reappear, and find new ways to express the virtue. It involves ongoing introspection and self-assessment, which can be supported by regular journaling. This process helps you integrate the virtue more deeply, allowing it to become a more natural part of who you are. The activities you can perform to support this stage include consciously recognizing when you are living the virtue, remembering the subtle ways old character defects can creep back in, and understanding that the work of building a virtue is a part of maintaining it.
 
       **USER CONTEXT:**
       - **Virtue:** ${virtueName}
       - **Virtue Definition:** ${virtueDef}
-      - **AI Analysis of User's Character Defects:** "${characterDefectAnalysis}"
-      - **User's Writing Progress on Stage 1 So Far:** """${stage1MemoContent || "The user has not started writing for this stage yet."}"""
+      - **Stage 1 Completed Work:** """${stage1MemoContent}"""
+      - **Stage 2 Completed Work:** """${stage2MemoContent}"""
+      - **Stage 3 Progress:** """${stage3MemoContent || "The user has not started Stage 3 writing yet."}"""
 
       **YOUR TASK:**
-      Based on ALL the information above, generate a thoughtful and encouraging prompt of about 250 words. Your response MUST do the following:
-      1.  Acknowledge the user's current position in their journey with this virtue, referencing the provided AI analysis of their character defects.
-      2.  If the user has already written something, briefly acknowledge their progress and insights.
-      3.  Gently guide their focus toward a specific character defect mentioned in the analysis. Explain how this specific defect acts as a barrier to practicing the virtue of ${virtueName}.
-      4.  Conclude with a direct, open-ended question or a reflective task. This should encourage the user to explore a specific memory, feeling, or pattern of behavior related to that defect. The goal is to help them see the defect clearly without judgment.
+      Generate a focused writing prompt (limit 200 words) that:
+      1. Acknowledges their journey through Stages 1 and 2
+      2. Focuses on sustaining and deepening their practice of ${virtueName}
+      3. Identifies ONE specific area for reflection: recognizing virtue in action, noticing old patterns creeping back, or finding new expressions of the virtue
+      4. Encourages ongoing self-assessment and integration
+      5. Ends with a specific question about maintaining long-term growth
 
-      Frame your response with empathy and wisdom. You are a trusted companion on their journey of self-discovery and growth. Refer to the user as "you".
+      Keep the scope focused on maintenance and sustainability. Frame with wisdom and encouragement for the ongoing journey.
     `;
 
     // --- Model Execution Logic (Unchanged) ---
