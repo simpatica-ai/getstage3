@@ -24,7 +24,7 @@ functions.http('getstage3', async (req, res) => {
       return res.status(400).send({ error: 'Invalid request body' });
     }
 
-    const { virtueName, virtueDef, characterDefectAnalysis, stage1MemoContent, stage2MemoContent, stage3MemoContent, stage1Complete, stage2Complete } = req.body;
+    const { virtueName, virtueDef, characterDefectAnalysis, stage1MemoContent, stage2MemoContent, stage3MemoContent, stage1Complete, stage2Complete, previousPrompts } = req.body;
 
     // Validate required fields
     if (!virtueName || !virtueDef || !characterDefectAnalysis) {
@@ -58,12 +58,20 @@ functions.http('getstage3', async (req, res) => {
       - **Stage 1 Completed Work:** """${stage1MemoContent}"""
       - **Stage 2 Completed Work:** """${stage2MemoContent}"""
       - **Stage 3 Progress:** """${stage3MemoContent || "The user has not started Stage 3 writing yet."}"""
+      - **Previous Prompts Given:** ${previousPrompts ? `"""${JSON.stringify(previousPrompts)}"""` : "No previous prompts for this virtue stage."}
+
+      **COMPLETION CHECK:** Analyze the user's Stage 3 writing progress. If they have demonstrated consistent practice and integration of the virtue, with evidence of sustained application and awareness of old patterns, acknowledge mastery and celebrate completion of this virtue's development.
 
       **YOUR TASK:**
       Generate a focused writing prompt (limit 200 words) that:
-      1. Acknowledges their journey through Stages 1 and 2
-      2. Focuses on sustaining and deepening their practice of ${virtueName}
-      3. Identifies ONE specific area for reflection: recognizing virtue in action, noticing old patterns creeping back, or finding new expressions of the virtue
+      ${stage3MemoContent ? 
+        `1. Acknowledges their existing Stage 3 progress and insights, referencing previous prompts if relevant
+         2. Either: (a) If maintaining appears complete with consistent integration, congratulate them on virtue mastery, OR (b) Focus on areas still needing sustained attention
+         3. If incomplete, identify ONE specific maintenance topic for reflection` 
+        : 
+        `1. Acknowledges their journey through Stages 1 and 2
+         2. Focuses on sustaining and deepening their practice of ${virtueName}
+         3. Identifies ONE specific area for reflection: recognizing virtue in action, noticing old patterns creeping back, or finding new expressions of the virtue`}
       4. Encourages ongoing self-assessment and integration
       5. Ends with a specific question about maintaining long-term growth
 
