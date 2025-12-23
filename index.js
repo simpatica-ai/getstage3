@@ -52,6 +52,8 @@ functions.http('getstage3', async (req, res) => {
 
       **Maintaining Virtue Definition:** The practice of maintaining a virtue is an ongoing journey of continuous awareness and application, shifting from building new habits to sustaining them over time. This stage of a virtuous life requires you to consistently embody the virtue, notice subtle ways old character defects might reappear, and find new ways to express the virtue. It involves ongoing introspection and self-assessment, which can be supported by regular journaling. This process helps you integrate the virtue more deeply, allowing it to become a more natural part of who you are. The activities you can perform to support this stage include consciously recognizing when you are living the virtue, remembering the subtle ways old character defects can creep back in, and understanding that the work of building a virtue is a part of maintaining it.
 
+      **SPELLING AND GRAMMAR ARE VERY IMPORTANT.  Review all responses for spelling and grammar.
+
       **USER CONTEXT:**
       - **Virtue:** ${virtueName}
       - **Virtue Definition:** ${virtueDef}
